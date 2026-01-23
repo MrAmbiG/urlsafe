@@ -44,14 +44,7 @@ docker-compose up --build
 
 #### From GitHub Packages (OCI Registry)
 ```bash
-helm install urlsafe oci://ghcr.io/mramb ig/charts/urlsafe --version 0.1.x
-```
-
-#### From Artifact.io
-```bash
-helm repo add mramb ig https://mramb ig.artifact.io/charts
-helm repo update
-helm install urlsafe mramb ig/urlsafe
+helm install urlsafe oci://ghcr.io/mrambig/charts/urlsafe --version 0.1.x
 ```
 
 #### From Local Chart
