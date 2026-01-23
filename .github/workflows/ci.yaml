@@ -21,6 +21,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Get project version
+        id: version
+        run: |
+          VERSION=$(grep '^version =' pyproject.toml | cut -d '"' -f 2)
+          echo "PROJECT_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -47,6 +54,7 @@ jobs:
             ${{ env.REGISTRY_DOCKERHUB }}/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=latest
+            type=raw,value=${{ env.PROJECT_VERSION }}
             type=sha,prefix=,format=long
 
       - name: Build and push Docker images
@@ -66,10 +74,14 @@ jobs:
 
       - name: Package Helm chart
         run: |
-          helm package k8s/urlsafe --version 0.1.${{ github.run_number }} --app-version ${{ github.sha }}
+          helm package k8s/urlsafe --version ${{ env.PROJECT_VERSION }}.${{ github.run_number }} --app-version ${{ env.PROJECT_VERSION }}
+
+      - name: Lowercase repository owner
+        run: |
+          echo "OWNER_LC=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
       - name: Push Helm chart to GitHub Packages (OCI)
         run: |
           echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ${{ env.REGISTRY_GHCR }} --username ${{ github.actor }} --password-stdin
-          helm push urlsafe-0.1.${{ github.run_number }}.tgz oci://${{ env.REGISTRY_GHCR }}/${{ github.repository_owner }}/charts
+          helm push urlsafe-${{ env.PROJECT_VERSION }}.${{ github.run_number }}.tgz oci://${{ env.REGISTRY_GHCR }}/${{ env.OWNER_LC }}/charts
 
