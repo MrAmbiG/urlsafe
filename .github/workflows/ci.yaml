@@ -9,7 +9,6 @@ env:
   REGISTRY_GHCR: ghcr.io
   REGISTRY_DOCKERHUB: docker.io
   IMAGE_NAME: urlsafe
-  ARTIFACT_API_KEY_SECRET: ${{ secrets.ARTIFACT_API_KEY_SECRET }}
 
 jobs:
   build-and-publish:
@@ -74,11 +73,3 @@ jobs:
           echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ${{ env.REGISTRY_GHCR }} --username ${{ github.actor }} --password-stdin
           helm push urlsafe-0.1.${{ github.run_number }}.tgz oci://${{ env.REGISTRY_GHCR }}/${{ github.repository_owner }}/charts
 
-      - name: Push Helm chart to Artifact.io
-        if: vars.ARTIFACT_API_KEY_ID != '' && env.ARTIFACT_API_KEY_SECRET != ''
-        run: |
-          curl -X POST \
-            -H "X-API-Key-ID: ${{ vars.ARTIFACT_API_KEY_ID }}" \
-            -H "X-API-Key-Secret: ${{ secrets.ARTIFACT_API_KEY_SECRET }}" \
-            -F "chart=@urlsafe-0.1.${{ github.run_number }}.tgz" \
-            https://api.artifact.io/v1/charts
