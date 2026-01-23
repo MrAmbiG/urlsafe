@@ -79,3 +79,5 @@ helm upgrade urlsafe k8s/urlsafe
 ```bash
 helm uninstall urlsafe
 ```
+
+### EOF ###
