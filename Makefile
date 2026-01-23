@@ -12,16 +12,17 @@ venv:
 run:
 	uv run uvicorn app.main:app --reload
 
-# Run with Docker Compose (Attached)
-docker-up:
-	docker-compose up --build
+# Run with Docker Compose
+du:
+	docker compose down && docker compose up --remove-orphans
 
-# Run with Docker Compose (Detached)
-docker-up-d:
-	docker-compose up -d --build --remove-orphans
+# Run with Docker Compose (build)
+dudb:
+	docker compose down && docker compose up -d --build --remove-orphans
 
-docker-down:
-	docker-compose down
+# Run with docker compose down
+dd:
+	docker compose down
 
 # Run integration tests
 test:
