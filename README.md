@@ -2,6 +2,8 @@
 
 Microservice to check and categorize URLs (Porn/Adult, Social, Gambling, Ad/Malware).
 
+*note: This does not need constant update, as this is a wrapper around StevenBlack's hostfiles and gets updated every hour.*
+
 ## API
 
 ### Check URL
