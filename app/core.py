@@ -1,6 +1,7 @@
 import requests
 import logging
 from urllib.parse import urlparse
+from datetime import datetime, timedelta
 import tldextract
 
 logger = logging.getLogger(__name__)
@@ -13,6 +14,9 @@ SOURCES = {
     "admalware": "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts",
 }
 
+# Refresh interval: 1 hour
+REFRESH_INTERVAL = timedelta(hours=1)
+
 class CategoryChecker:
     def __init__(self):
         self.categories: dict[str, set[str]] = {
@@ -21,6 +25,7 @@ class CategoryChecker:
             "gambling": set(),
             "admalware": set(),
         }
+        self.last_fetched: datetime | None = None
 
     def fetch_hosts(self, url: str) -> set[str]:
         """Fetch and parse hosts file from URL."""
@@ -51,6 +56,22 @@ class CategoryChecker:
         """Load all categories."""
         for category, url in SOURCES.items():
             self.categories[category] = self.fetch_hosts(url)
+        self.last_fetched = datetime.now()
+        logger.info(f"All lists loaded at {self.last_fetched}")
+
+    async def refresh_if_needed(self):
+        """Refresh lists if more than REFRESH_INTERVAL has passed since last fetch."""
+        if self.last_fetched is None:
+            logger.info("No previous fetch detected, loading lists...")
+            self.load_all()
+            return
+
+        time_since_fetch = datetime.now() - self.last_fetched
+        if time_since_fetch >= REFRESH_INTERVAL:
+            logger.info(f"Refreshing lists (last fetch was {time_since_fetch} ago)")
+            self.load_all()
+        else:
+            logger.debug(f"No refresh needed (last fetch was {time_since_fetch} ago)")
 
     def check_url(self, url: str) -> dict[str, bool]:
         """Check a URL against all categories."""

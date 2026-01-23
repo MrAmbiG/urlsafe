@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: urlsafe
-        image: urlsafe:latest
+        image: gajuambi/urlsafe:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8000

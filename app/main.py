@@ -3,11 +3,23 @@ from contextlib import asynccontextmanager
 from app.models import CheckResponse
 from app.core import CategoryChecker
 import logging
+import asyncio
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 checker = CategoryChecker()
+
+async def background_refresh_task():
+    """Background task that checks every 10 minutes if lists need refreshing."""
+    logger.info("Background refresh task started")
+    try:
+        while True:
+            await asyncio.sleep(600)  # Sleep for 10 minutes
+            await checker.refresh_if_needed()
+    except asyncio.CancelledError:
+        logger.info("Background refresh task cancelled")
+        raise
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -15,8 +27,18 @@ async def lifespan(app: FastAPI):
     logger.info("Loading blocklists...")
     checker.load_all()
     logger.info("Blocklists loaded.")
+
+    # Start background refresh task
+    refresh_task = asyncio.create_task(background_refresh_task())
+
     yield
-    # Cleanup if needed
+
+    # Cleanup: cancel background task
+    refresh_task.cancel()
+    try:
+        await refresh_task
+    except asyncio.CancelledError:
+        pass
 
 app = FastAPI(title="URLSafe", lifespan=lifespan)
 
