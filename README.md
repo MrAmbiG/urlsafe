@@ -40,7 +40,49 @@ docker-compose up --build
 
 ## Kubernetes
 
-Deploy to K8s:
+### Install with Helm
+
+#### From GitHub Packages (OCI Registry)
 ```bash
-kubectl apply -f k8s/
+helm install urlsafe oci://ghcr.io/mramb ig/charts/urlsafe --version 0.1.x
+```
+
+#### From Artifact.io
+```bash
+helm repo add mramb ig https://mramb ig.artifact.io/charts
+helm repo update
+helm install urlsafe mramb ig/urlsafe
+```
+
+#### From Local Chart
+```bash
+helm install urlsafe k8s/urlsafe
+```
+
+### Customize Installation
+
+Create a `values.yaml` file to override defaults:
+```yaml
+replicaCount: 5
+image:
+  tag: "sha256-abc123"
+resources:
+  limits:
+    memory: "1Gi"
+    cpu: "1000m"
+```
+
+Then install with custom values:
+```bash
+helm install urlsafe k8s/urlsafe -f values.yaml
+```
+
+### Upgrade Release
+```bash
+helm upgrade urlsafe k8s/urlsafe
+```
+
+### Uninstall
+```bash
+helm uninstall urlsafe
 ```

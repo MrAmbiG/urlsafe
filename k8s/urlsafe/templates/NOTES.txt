@@ -1,0 +1,23 @@
+Thank you for installing {{ .Chart.Name }}!
+
+Your release is named {{ .Release.Name }}.
+
+To learn more about the release, try:
+
+  $ helm status {{ .Release.Name }}
+  $ helm get all {{ .Release.Name }}
+
+To access the urlsafe service:
+
+{{- if eq .Values.service.type "ClusterIP" }}
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "urlsafe.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:{{ .Values.service.targetPort }}
+
+  Then visit http://127.0.0.1:8080/check?url=example.com to test the API
+{{- end }}
+
+To check the deployment status:
+  kubectl get deployment {{ include "urlsafe.fullname" . }} -n {{ .Release.Namespace }}
+
+To view the pods:
+  kubectl get pods -l "app.kubernetes.io/name={{ include "urlsafe.name" . }}" -n {{ .Release.Namespace }}
