@@ -74,7 +74,7 @@ jobs:
 
       - name: Package Helm chart
         run: |
-          helm package k8s/urlsafe --version ${{ env.PROJECT_VERSION }}.${{ github.run_number }} --app-version ${{ env.PROJECT_VERSION }}
+          helm package k8s/urlsafe --version ${{ env.PROJECT_VERSION }}-${{ github.run_number }} --app-version ${{ env.PROJECT_VERSION }}
 
       - name: Lowercase repository owner
         run: |
@@ -83,5 +83,5 @@ jobs:
       - name: Push Helm chart to GitHub Packages (OCI)
         run: |
           echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ${{ env.REGISTRY_GHCR }} --username ${{ github.actor }} --password-stdin
-          helm push urlsafe-${{ env.PROJECT_VERSION }}.${{ github.run_number }}.tgz oci://${{ env.REGISTRY_GHCR }}/${{ env.OWNER_LC }}/charts
+          helm push urlsafe-${{ env.PROJECT_VERSION }}-${{ github.run_number }}.tgz oci://${{ env.REGISTRY_GHCR }}/${{ env.OWNER_LC }}/charts
 
