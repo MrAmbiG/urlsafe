@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "urlsafe.fullname" . }}
+  namespace: {{ .Values.namespace }}
   labels:
     {{- include "urlsafe.labels" . | nindent 4 }}
 spec:

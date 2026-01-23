@@ -54,6 +54,15 @@ helm install urlsafe k8s/urlsafe
 
 ### Customize Installation
 
+By default, the chart installs into the `sfwcheck` namespace and creates it if it doesn't exist.
+
+#### Override Namespace
+To install into a different namespace:
+```bash
+helm install urlsafe k8s/urlsafe --set namespace=my-custom-ns
+```
+
+#### Override with values.yaml
 Create a `values.yaml` file to override defaults:
 ```yaml
 replicaCount: 5

@@ -1,4 +1,6 @@
 # Default values for urlsafe
+namespace: sfwcheck
+createNamespace: true
 replicaCount: 3
 
 image:
